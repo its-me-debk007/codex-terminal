@@ -61,11 +61,15 @@ class CodexTerminalService(private val project: Project) : Disposable {
     }
 
     fun insertText(text: String) {
-        val widget = launchOrFocus()
+        val selectedTerminal = findSelectedTerminalTab() ?: run {
+            log.warn("No selected terminal tab is available; cannot insert text.")
+            return
+        }
+        val widget = selectedTerminal.widget
         val connector = widget.ttyConnector
         if (connector == null) {
             log.warn(
-                "Codex TTY connector is not ready; cannot insert text yet. " +
+                "Selected terminal TTY connector is not ready; cannot insert text yet. " +
                     "Try again once the terminal has finished starting."
             )
             return
@@ -77,11 +81,25 @@ class CodexTerminalService(private val project: Project) : Disposable {
             log.warn("Failed to write to Codex terminal", t)
             return
         }
-        findCodexTab()?.content?.let { focusTerminalContent(it) } ?: focusTerminalToolWindow()
     }
 
     override fun dispose() {
         stopSoundMonitor()
+    }
+
+    private fun findSelectedTerminalTab(): TerminalTab? {
+        val selectedContent: Content = ToolWindowManager.getInstance(project)
+            .getToolWindow(TERMINAL_TOOL_WINDOW_ID)
+            ?.contentManager
+            ?.selectedContent
+            ?: return null
+        return terminalTabForContent(selectedContent)
+    }
+
+    private fun terminalTabForContent(content: Content): TerminalTab? {
+        if (!content.isValid) return null
+        val widget = TerminalToolWindowManager.findWidgetByContent(content) ?: return null
+        return widget.takeIf(::isWidgetAlive)?.let { TerminalTab(content, it) }
     }
 
     private fun findCodexTab(): TerminalTab? {
