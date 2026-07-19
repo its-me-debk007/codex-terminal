@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.codexjb"
-version = "1.0.3"
+version = "1.0.5-beta"
 
 val pluginId = "com.github.codexjb"
 val pluginName = "Codex in Terminal"
