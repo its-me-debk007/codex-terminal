@@ -1,1 +1,1 @@
-rootProject.name = "codex-in-terminal"
+rootProject.name = "codex-cli"
