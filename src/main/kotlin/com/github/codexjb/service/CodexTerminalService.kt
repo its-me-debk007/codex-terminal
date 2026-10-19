@@ -20,7 +20,7 @@ import kotlinx.coroutines.runBlocking
  * - [launchOrFocus] creates the tab and runs the configured Codex command if no live tab exists,
  *   focuses the existing Codex tab if it is still running, or restarts Codex in that tab when
  *   the terminal is still open but the foreground command has exited.
- * - [insertText] writes raw text into the live tab's PTY without pressing Enter, so the user can
+ * - [insertText] writes raw text into the selected terminal tab without pressing Enter, so the user can
  *   append their own prompt before submitting.
  */
 @Service(Service.Level.PROJECT)
@@ -56,44 +56,30 @@ class CodexTerminalService(private val project: Project) {
     }
 
     fun insertText(text: String) {
-        val selectedTerminal = findSelectedTerminalTab() ?: run {
+        val tab = findSelectedTerminalTab() ?: run {
             log.warn("No selected terminal tab is available; cannot insert text.")
-            return
-        }
-        val widget = selectedTerminal.widget
-        val connector = widget.ttyConnector
-        if (connector == null) {
-            log.warn(
-                "Selected terminal TTY connector is not ready; cannot insert text yet. " +
-                    "Try again once the terminal has finished starting."
-            )
             return
         }
 
         try {
             tab.view.sendText(text)
         } catch (t: Throwable) {
-            log.warn("Failed to write to Codex terminal", t)
+            log.warn("Failed to write to terminal", t)
             return
         }
-    }
 
         focusTerminalContent(tab.content)
     }
 
-    private fun findSelectedTerminalTab(): TerminalTab? {
+    private fun findSelectedTerminalTab(): TerminalToolWindowTab? {
         val selectedContent: Content = ToolWindowManager.getInstance(project)
             .getToolWindow(TERMINAL_TOOL_WINDOW_ID)
             ?.contentManager
             ?.selectedContent
+            ?.takeIf { it.isValid }
             ?: return null
-        return terminalTabForContent(selectedContent)
-    }
-
-    private fun terminalTabForContent(content: Content): TerminalTab? {
-        if (!content.isValid) return null
-        val widget = TerminalToolWindowManager.findWidgetByContent(content) ?: return null
-        return widget.takeIf(::isWidgetAlive)?.let { TerminalTab(content, it) }
+        return TerminalToolWindowTabsManager.getInstance(project).tabs
+            .firstOrNull { it.content == selectedContent }
     }
 
     private fun findCodexTab(): TerminalToolWindowTab? {
