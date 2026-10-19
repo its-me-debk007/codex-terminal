@@ -87,7 +87,6 @@ Both shortcuts are rebindable under `Settings → Keymap → Plugins → Codex C
 
 ## Known limitations
 
-- **Reworked Terminal (experimental)** — if you've enabled the new terminal via Registry, text injection may not work. Stay on the classic terminal for now.
 - **Paths with spaces** — the unquoted `@path` / `@path#Lx-Ly` format may misparse on some shells. File an issue if you hit this.
 
 ## Building
