@@ -1,3 +1,5 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "2.1.0"
@@ -8,7 +10,7 @@ group = "com.github.codexjb"
 version = "1.0.5-beta"
 
 val pluginId = "com.github.codexjb"
-val pluginName = "Codex in Terminal"
+val pluginName = "Codex CLI"
 val pluginVersion = project.version.toString()
 val platformVersion = providers.gradleProperty("platformVersion").orElse("2025.3.3")
 val pluginSinceBuild = providers.gradleProperty("pluginSinceBuild").orElse("253")
@@ -33,37 +35,44 @@ intellijPlatform {
         name = pluginName
         version = pluginVersion
         description = """
-            <p><b>Share the current editor file or selection with the <code>codex</code> CLI in one keystroke.</b></p>
-            <p>The core feature: press a shortcut in the editor, and a precise file reference is typed
-            straight into your running Codex session. If text is selected, the reference includes
-            the selected line range. No copy/paste, no re-typing paths, no re-explaining where the file lives.</p>
-            <p>Example with no selection:</p>
-            <pre><code>@src/main/kotlin/com/github/codexjb/service/CodexTerminalService.kt</code></pre>
-            <p>Example with selected text:</p>
-            <pre><code>@src/main/kotlin/com/github/codexjb/service/CodexTerminalService.kt#L25-L40</code></pre>
-            <p>Codex resolves the reference automatically from the inserted path.</p>
-            <p>Additional features:</p>
+            <p><b>Codex CLI keeps the OpenAI Codex command-line agent one shortcut away inside your IDE.</b></p>
+            <p>Open a dedicated Codex terminal tab, send the current editor file or selected line range as an <code>@path</code> reference, and keep the conversation grounded in the exact code you are looking at.</p>
+            <p>This extension is intentionally terminal-first: it launches the Codex CLI you install or configure, then focuses on fast editor-to-terminal handoff.</p>
+            <br/>
+            <p><b>Features</b></p>
             <ul>
-              <li><b>One-click launch</b> &mdash; a sidebar icon (or <kbd>Ctrl/Cmd+Alt+Shift+C</kbd>) starts <code>codex</code> in a dedicated terminal tab.</li>
-              <li><b>Editor file references</b> &mdash; inserts the current editor file path, or the selected line range when text is selected.</li>
-              <li><b>Working-directory relative paths</b> &mdash; references match exactly what Codex sees as its working directory, with absolute paths for files outside it.</li>
-              <li><b>Optional attention sound</b> &mdash; play a system sound when Codex appears to need confirmation or has finished responding.</li>
-              <li><b>Configurable command</b> &mdash; <code>codex</code>, <code>npx @openai/codex</code>, custom binaries, or WSL wrappers.</li>
+              <li><b>Dedicated Codex terminal tab</b>: open or focus Codex from the tool window strip, Tools menu, or keyboard shortcut.</li>
+              <li><b>Editor file references</b>: insert <code>@path</code> with no selection, or <code>@path#L12-L34</code> when code is selected.</li>
+              <li><b>Working-directory-aware paths</b>: references are relative to the configured Codex working directory, with absolute paths for files outside it.</li>
+              <li><b>Smart terminal recovery</b>: if the Codex tab is still open but the process stopped, the launch action reruns your configured command in that same tab.</li>
+              <li><b>Configurable launch command</b>: use <code>codex</code>, <code>npx @openai/codex</code>, a custom binary, or a WSL wrapper.</li>
             </ul>
-            <p>Works across IntelliJ IDEA, WebStorm, PyCharm, GoLand, PhpStorm, RubyMine, and Android Studio.</p>
+            <br/>
+            <p><b>Usage</b></p>
+            <ul>
+              <li>Click the Codex icon in the right-hand tool window strip, or press <code>Ctrl+Alt+Shift+C</code> / <code>Cmd+Alt+Shift+C</code>.</li>
+              <li>The integrated terminal opens a dedicated Codex tab and runs the configured command automatically.</li>
+              <li>In the editor, select code if needed and press <code>Ctrl+Alt+K</code> / <code>Cmd+Alt+K</code> to insert the reference into Codex, then type your question and submit.</li>
+            </ul>
+            <br/>
+            <p><b>Configuration</b></p>
+            <p>Open Settings → Tools → Codex CLI to set the launch command and working directory.</p>
+            <br/>
+            <p><b>Requirements</b></p>
+            <ul>
+              <li>IDE based on platform build 253 (2025.3) or later</li>
+              <li>OpenAI Codex CLI installed and available in your system PATH, or launched through <code>npx</code> / a custom command</li>
+            </ul>
+            <p><b>Note:</b> Codex also has an official IDE integration. This extension remains a lightweight terminal-first alternative for developers who prefer the CLI workflow.</p>
         """.trimIndent()
         changeNotes = """
-            <p><b>1.0.3 &mdash; selection-aware references</b></p>
+            <p><b>1.0.4 &mdash; Marketplace name update</b></p>
             <ul>
-              <li><b>Fixed reference formatting</b>: no selection now inserts only <code>@path</code>, while selected text inserts <code>@path#Lstart-Lend</code>.</li>
-              <li><b>Selection ranges are back</b>: selecting even one character now links the file and the selected line number/range.</li>
-              <li><b>Improved confirmation sounds</b>: sound notifications now track active confirmation prompts, remind while a prompt is waiting, and stop as soon as the terminal shows an answer or continued output.</li>
-              <li><b>Improved confirmation detection</b>: catches more approval/permission/yes-no style prompts without re-triggering from stale terminal history.</li>
-              <li><b>Fixed file reference insertion</b>: the shortcut now uses the actual open editor document, so same-named files in different folders no longer resolve to the wrong file.</li>
-              <li><b>Fixed Codex terminal focus</b>: clicking the Codex icon now selects the existing Codex terminal tab instead of merely opening whatever Terminal tab was active.</li>
-              <li><b>Fixed stopped agent recovery</b>: if the Codex tab is still open but the agent process has exited, clicking the icon reruns the configured Codex command in that tab.</li>
-              <li><b>Improved path resolution</b>: file links are relative to the configured Codex working directory, with absolute paths for files outside it.</li>
-              <li><b>Added optional sound notifications</b>: enable a system sound when Codex appears to need confirmation or has finished responding.</li>
+              <li><b>Renamed the extension</b>: the Marketplace-visible name is now <code>Codex CLI</code>, avoiding restricted platform/vendor terms.</li>
+              <li><b>Focused the extension on the CLI workflow</b>: removed the experimental Codex notification feature and its background terminal-output monitor.</li>
+              <li><b>Simplified settings</b>: Settings &rarr; Tools &rarr; Codex CLI now contains only the launch command and working directory.</li>
+              <li><b>Fixed first shortcut exception</b>: checking whether the Codex process is still running now happens outside the IDE read action, so the first file-reference shortcut no longer trips terminal threading assertions.</li>
+              <li><b>Kept terminal workflow intact</b>: launch/focus behavior and editor file reference insertion are unchanged.</li>
             </ul>
         """.trimIndent()
         ideaVersion {
@@ -76,6 +85,12 @@ intellijPlatform {
     }
     instrumentCode = false
     buildSearchableOptions = false
+    pluginVerification {
+        ides {
+            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.3.5", useInstaller = false)
+            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2026.1.2", useInstaller = false)
+        }
+    }
 }
 
 kotlin {

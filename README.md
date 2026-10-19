@@ -1,10 +1,12 @@
-# Codex in Terminal
+# Codex CLI
 
 **Share the current editor file or selection with the OpenAI [`codex`](https://www.npmjs.com/package/@openai/codex) CLI in one keystroke.**
 
-The core feature: press a shortcut in the editor, and a precise file reference is typed straight into your running Codex session. If text is selected, the reference includes the selected line range. No copy/paste, no re-typing paths, no re-explaining where the file lives.
+Codex CLI is a lightweight, terminal-first extension for developers who already use the Codex command-line agent and want it close to their editor. Press a shortcut in the editor, and a precise file reference is typed straight into your running Codex session. If text is selected, the reference includes the selected line range. No copy/paste, no re-typing paths, no re-explaining where the file lives.
 
-Inspired by the official [Claude Code JetBrains plugin](https://code.claude.com/docs/en/jetbrains) — same UX, different backend.
+Inspired by the official Claude Code IDE workflow — same UX, different backend.
+
+Codex also has an official IDE integration. This extension stays intentionally lightweight for developers who prefer the CLI running in the IDE terminal.
 
 ## How it works
 
@@ -32,15 +34,18 @@ Paths are relative to the configured Codex working directory. If a file is outsi
 ## Features
 
 - **Insert file references from the editor** — the headline feature. `Ctrl+Alt+K` / `Cmd+Alt+K`, editor right-click menu, or bind your own shortcut.
-- **One-click launch** — click the Codex sidebar icon or press `Ctrl+Alt+Shift+C` / `Cmd+Alt+Shift+C` to drop straight into the CLI.
-- **Configurable command** — `Settings → Tools → Codex in Terminal`. Works with `codex`, `npx @openai/codex`, custom paths, or WSL wrappers like `wsl -d Ubuntu -- bash -lic "codex"`.
-- **Optional attention sound** — play a system sound when Codex appears to need confirmation or has finished responding.
+- **Dedicated Codex terminal tab** — click the Codex sidebar icon or press `Ctrl+Alt+Shift+C` / `Cmd+Alt+Shift+C` to open or focus the CLI.
+- **Smart terminal recovery** — if the Codex tab is still open but the process has stopped, the launch action reruns your configured command in that same tab.
+- **Working-directory-aware paths** — references are relative to the configured Codex working directory, with absolute paths used for files outside it.
+- **Configurable command** — `Settings → Tools → Codex CLI`. Works with `codex`, `npx @openai/codex`, custom paths, or WSL wrappers like `wsl -d Ubuntu -- bash -lic "codex"`.
 
 ## Supported IDEs
 
-IntelliJ IDEA, WebStorm, PyCharm, GoLand, PhpStorm, RubyMine, Android Studio, and any other JetBrains IDE based on platform build `253` (2025.3) or later.
+Supported IDEs based on platform build `253` (2025.3) or later.
 
 ## Installation
+
+The extension does not bundle the Codex CLI. Install `codex` separately or configure it to launch through `npx`.
 
 ### From source
 
@@ -48,7 +53,7 @@ IntelliJ IDEA, WebStorm, PyCharm, GoLand, PhpStorm, RubyMine, Android Studio, an
 ./gradlew buildPlugin
 ```
 
-Output: `build/distributions/codex-in-terminal-1.0.3.zip`.
+Output: `build/distributions/codex-cli-1.0.4.zip`.
 
 In your IDE: `Settings → Plugins → ⚙ → Install Plugin from Disk…` and select the zip. Restart the IDE.
 
@@ -64,7 +69,7 @@ Or configure the plugin to use `npx @openai/codex` (no global install required).
 
 ## Keybindings
 
-Both shortcuts are rebindable under `Settings → Keymap → Plugins → Codex in Terminal`.
+Both shortcuts are rebindable under `Settings → Keymap → Plugins → Codex CLI`.
 
 | Action | Windows/Linux | macOS |
 |---|---|---|
@@ -73,17 +78,16 @@ Both shortcuts are rebindable under `Settings → Keymap → Plugins → Codex i
 
 ## Settings
 
-`Settings → Tools → Codex in Terminal`
+`Settings → Tools → Codex CLI`
 
 | Setting | Default | Notes |
 |---|---|---|
 | Codex command | `codex` | Anything runnable in the integrated terminal shell. |
 | Working directory | *(project root)* | Where the shell starts. |
-| Play sound when Codex needs attention or finishes responding | Off | Uses the system beep for confirmations, gentle reminders, and likely ready prompts. |
 
 ## Known limitations
 
-- **Reworked Terminal (experimental)** — if you've enabled JetBrains' new terminal via Registry, text injection may not work. Stay on the classic terminal for now.
+- **Reworked Terminal (experimental)** — if you've enabled the new terminal via Registry, text injection may not work. Stay on the classic terminal for now.
 - **Paths with spaces** — the unquoted `@path` / `@path#Lx-Ly` format may misparse on some shells. File an issue if you hit this.
 
 ## Building
